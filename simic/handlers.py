@@ -6,9 +6,15 @@ from jupyter_server.utils import url_path_join
 
 import tornado
 from tornado.web import StaticFileHandler
+# from .detreefy import Detreefy
 
 
 class RouteHandler(APIHandler):
+    def __init__ (self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.code_list = []
+        # self.detreefy = Detreefy()
+
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
@@ -21,7 +27,17 @@ class RouteHandler(APIHandler):
         # input_data is a dictionary with a key "sanpshot"
         input_data = self.get_json_body()
         snap = "{}".format(input_data["snapshot"])
-        data = {"code": "{}".format(input_data["snapshot"])}
+        tmp = snap.split("!@#$%")
+        snap = tmp[0]
+        fileCount = tmp[1]
+        snapCount = tmp[2]
+
+        if snapCount == 2:
+            self.code_list.pop(0)
+
+        self.code_list.append(snap)
+        # self.detreefy.test_1()
+        data = {"code": snap, "fileCount": fileCount, "snapCount": snapCount}
         self.finish(json.dumps(data))
 
 
