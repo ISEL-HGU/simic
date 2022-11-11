@@ -1,20 +1,31 @@
 import os
 import json
+import shutil
 
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 
 import tornado
 from tornado.web import StaticFileHandler
-# from .detreefy import Detreefy
+
+#flush the cache at the beginning of the session
+def clear_code_cache(file_list,dir_name):
+    
+    for filename in file_list:
+        file_path = os.path.join(dir_name, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
+
+    # [contract] 2 code text files -> edit script
+def execute_gumtree():
+    # TO DO: add a command for gumtree
+    return
 
 
 class RouteHandler(APIHandler):
-    def __init__ (self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.code_list = []
-        # self.detreefy = Detreefy()
-
     # The following decorator should be present on all verb methods (head, get, post,
     # patch, put, delete, options) to ensure only authorized user can request the
     # Jupyter server
@@ -24,6 +35,10 @@ class RouteHandler(APIHandler):
 # using this function for now
     @tornado.web.authenticated
     def post(self):
+        
+        dir_name = './code_cache'
+        
+        
         # input_data is a dictionary with a key "sanpshot"
         input_data = self.get_json_body()
         snap = "{}".format(input_data["snapshot"])
@@ -31,13 +46,29 @@ class RouteHandler(APIHandler):
         snap = tmp[0]
         fileCount = tmp[1]
         snapCount = tmp[2]
+        if snapCount == '1':
+            if os.path.exists(dir_name):
+                shutil.rmtree(dir_name)
+            os.mkdir(dir_name)
+    
+        file_list = None
+        new_filename = 'code_cache/' + str(snapCount) + '.txt'
+        
+        with open(new_filename, "w") as f:
+            f.write(snap)
 
-        if snapCount == 2:
-            self.code_list.pop(0)
-
-        self.code_list.append(snap)
-        # self.detreefy.test_1()
-        data = {"code": snap, "fileCount": fileCount, "snapCount": snapCount}
+        if int(fileCount) >= 3:
+            file_list = os.listdir(dir_name)
+            names = []
+            for filename in file_list:
+                names.append(int(filename.split('.')[0]))
+            
+            os.remove('code_cache/' + str(min(names)) + '.txt')
+    
+            
+        data = {"code": file_list, 'fileCount': fileCount, 'snapCount': snapCount}
+        execute_gumtree(dir_name+str(int(snapCount)-1)+'.txt',dir_name+snapCount+'.txt')
+        
         self.finish(json.dumps(data))
 
 
@@ -58,3 +89,5 @@ def setup_handlers(web_app, url_path):
     )
     handlers = [("{}/(.*)".format(doc_url), StaticFileHandler, {"path": doc_dir})]
     web_app.add_handlers(".*$", handlers)
+
+
