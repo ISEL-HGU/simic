@@ -1,12 +1,36 @@
 import os
 import json
 import shutil
+import socket
+import sys
+import subprocess
 
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
 
 import tornado
 from tornado.web import StaticFileHandler
+
+def connect_to_pool(is_request: int, *args, **kwargs):
+    host = "127.0.0.1"          # Get local machine name
+    port = 64555                        # Reserve a port for your   service.
+    conn = socket.socket()                   # Create a socket object
+
+    conn.connect((host, port))
+
+    if is_request == 0:
+        intosend = kwargs.get('change_vector', None)
+    elif is_request == 1:
+        intosend = 'GET'
+    conn.sendall(bytes(intosend, 'utf-8'))
+
+    data = conn.recv(10000)
+
+    conn.close()                                    # Close the socket when done
+
+
+    return data
+
 
 #flush the cache at the beginning of the session
 def clear_code_cache(file_list,dir_name):
@@ -20,9 +44,15 @@ def clear_code_cache(file_list,dir_name):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     # [contract] 2 code text files -> edit script
-def execute_gumtree():
+def execute_gumtree(path1: str, path2: str):
     # TO DO: add a command for gumtree
-    return
+    srcPath = os.getcwd()+path1
+    dstPath = os.getcwd()+path2
+    process = subprocess.Popen(['make','-C' ,os.path.dirname(__file__)+'/simic_subprocesses', 'es_run','src='+srcPath, 'dst='+dstPath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    val = None
+    for line in process.stdout:
+        val = line
+    return str(val).replace('b\'','').replace('\\n\'','')    
 
 
 class RouteHandler(APIHandler):
@@ -31,14 +61,16 @@ class RouteHandler(APIHandler):
     # Jupyter server
     @tornado.web.authenticated
     def get(self):
-        self.finish(json.dumps({"data": "This is /simic/sending it to FE!"}))
+        data = connect_to_pool(1)
+        print(data)
+        self.finish(json.dumps({"code": data.decode('utf-8')}))
+
 # using this function for now
     @tornado.web.authenticated
     def post(self):
         
         dir_name = './code_cache'
-        
-        
+
         # input_data is a dictionary with a key "sanpshot"
         input_data = self.get_json_body()
         snap = "{}".format(input_data["snapshot"])
@@ -64,11 +96,16 @@ class RouteHandler(APIHandler):
                 names.append(int(filename.split('.')[0]))
             
             os.remove('code_cache/' + str(min(names)) + '.txt')
-    
-            
-        data = {"code": file_list, 'fileCount': fileCount, 'snapCount': snapCount}
-        execute_gumtree(dir_name+str(int(snapCount)-1)+'.txt',dir_name+snapCount+'.txt')
+        change_vector = None
+        if int(fileCount) == 2 or int(fileCount) == 3:
+            change_vector = execute_gumtree('/code_cache/'+str(int(snapCount)-1)+'.txt','/code_cache/'+snapCount+'.txt')
+            if change_vector == 'null':
+                data = {"code": 'error#1'}
+            else:
+                connect_to_pool(0, change_vector=change_vector+'!@#$%'+snap)
+
         
+        data = {"code": change_vector}
         self.finish(json.dumps(data))
 
 
