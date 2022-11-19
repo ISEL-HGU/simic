@@ -11,7 +11,7 @@ with (HERE / "labextension" / "package.json").open() as fid:
 
 
 def _jupyter_labextension_paths():
-    return [{"src": "labextension", "dest": data["snapshot"]}]
+    return [{"src": "labextension", "dest": data["name"]}]
 
 
 def _jupyter_server_extension_points():
