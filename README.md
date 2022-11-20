@@ -1,6 +1,5 @@
 # simic
 
-[![Github Actions Status](https://github.com/github_username/simic/workflows/Build/badge.svg)](https://github.com/github_username/simic/actions/workflows/build.yml)
 A JupyterLab extension.
 
 This extension is composed of a Python package named `simic`
@@ -13,11 +12,40 @@ for the frontend extension.
 
 ## Install
 
-To install the extension, execute:
 
-```bash
-pip install simic
-```
+Setup
+- [ ] make virtual env
+- [ ] conda create —name test 
+- [ ] jupyter lab setup
+    - [ ] git clone https://github.com/ISEL-HGU/simic
+    - [ ] cd simic (Change directory to the simic directory)
+    - [ ] conda install -c conda-forge jupyterlab
+    - [ ] pip install jupyter-packaging
+    - [ ] pip install -e .
+    - [ ] jupyter labextension develop . --overwrite
+    - [ ] jupyter server extension enable simic
+    - [ ] Run “make clean; make build” at simic/simic/simic_subprocesses
+    - [ ] jlpm build
+- [ ] pool setup
+    - [ ] git clone https://github.com/ISEL-HGU/simic_pool
+    - [ ] download pip dependencies
+        - [ ] anytime
+        - [ ] gensim
+        - [ ] pythonparser
+            - [ ] https://github.com/GumTreeDiff/pythonparser
+            - [ ] add pythonparser to $PATH (export PATH=…:$PATH)
+    - [ ] zsh clone.sh / bash clone.sh (takes a while)
+    - [ ] download model and pool
+        - [ ] https://drive.google.com/file/d/1lXitokvyUhdd0BObXdij7n_Idu5OJ5n1/view?usp=share_link
+		위치: project root
+        - [ ] https://drive.google.com/file/d/1I_1hhyF5jnN7RQdBzemB0BOw_ywK2Hpq/view?usp=share_link
+		위치: simic_poo/train/
+    - [ ] make build
+    - [ ] python3 server.py <IP address> <port number>
+		IP address: 127.0.0.1
+		port number: 64555
+
+- [ ] jupyter lab
 
 ## Uninstall
 
