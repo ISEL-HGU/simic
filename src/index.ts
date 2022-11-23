@@ -51,18 +51,18 @@ const extension: JupyterFrontEndPlugin<void> = {
     app.docRegistry.addWidgetExtension('Notebook', button);
 
     // POST request -> FE to BE
-    const dataToSend = { snapshot: 'code snapshot' };
-    try {
-      const reply = await requestAPI<any>('code', {
-        body: JSON.stringify(dataToSend),
-        method: 'POST'
-      });
-      console.log(reply);
-    } catch (reason) {
-      console.error(
-        `Error on POST /jlab-ext-example/code ${dataToSend}.\n${reason}`
-      );
-    }
+    // const dataToSend = { snapshot: 'code snapshot' };
+    // try {
+    //   const reply = await requestAPI<any>('code', {
+    //     body: JSON.stringify(dataToSend),
+    //     method: 'POST'
+    //   });
+    //   console.log(reply);
+    // } catch (reason) {
+    //   console.error(
+    //     `Error on POST /jlab-ext-example/code ${dataToSend}.\n${reason}`
+    //   );
+    // }
 
     // GET request -> BE to FE
     // try {

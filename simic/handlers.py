@@ -52,6 +52,7 @@ def execute_gumtree(path1: str, path2: str):
     val = None
     for line in process.stdout:
         val = line
+        print(line)
     return str(val).replace('b\'','').replace('\\n\'','')    
 
 
@@ -74,6 +75,9 @@ class RouteHandler(APIHandler):
         # input_data is a dictionary with a key "sanpshot"
         input_data = self.get_json_body()
         snap = "{}".format(input_data["snapshot"])
+        if snap == 'flush':
+            clear_code_cache(os.listdir(dir_name),dir_name)
+            return
         tmp = snap.split("!@#$%")
         snap = tmp[0]
         fileCount = tmp[1]

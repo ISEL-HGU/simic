@@ -10,7 +10,7 @@ import {
   toolbarNavClass
 } from '../style/Toolbar';
 import { ActionButton } from './ActionButton';
-import { reloadIcon } from '../style/icon';
+import {reloadIcon, trashIcon} from '../style/icon';
 import { requestAPI } from '../handler';
 import React from 'react';
 // import { CodeFrame } from './CodeFrame';
@@ -22,7 +22,21 @@ export const Toolbar: React.FunctionComponent = () => {
     const snapshot = await requestAPI<any>('code');
     setText(snapshot.code);
   };
+  const clearCodeCache = async (): Promise<void> => {
+      const dataToSend = { snapshot: 'flush' };
+      try {
+          const reply = await requestAPI<any>('code', {
+              body: JSON.stringify(dataToSend),
+              method: 'POST'
+          });
+          console.log(reply);
+      } catch (reason) {
+          console.error(
+              `Error on POST /flushing ${dataToSend}.\n${reason}`
+          );
+      }
 
+  }
   return (
     <nav className={toolbarClass}>
       <div className={toolbarNavClass}>
@@ -32,6 +46,12 @@ export const Toolbar: React.FunctionComponent = () => {
           title="Take snapshot"
           onClick={handleClick}
         />
+          <ActionButton
+              className={toolbarButtonClass}
+              icon={trashIcon}
+              title="Take snapshot"
+              onClick={clearCodeCache}
+          />
       </div>
       <div className={spacer} />
       <div>{text}</div>
