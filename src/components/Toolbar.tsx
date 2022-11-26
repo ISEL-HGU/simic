@@ -20,8 +20,10 @@ export const Toolbar: React.FunctionComponent = () => {
 
   const handleClick = async (): Promise<void> => {
     const snapshot = await requestAPI<any>('code');
+    // const finaltext = snapshot.code.replace(/(?:\r\n|\r|\n)/g, '\"<br />\"');
     setText(snapshot.code);
   };
+
   const clearCodeCache = async (): Promise<void> => {
       const dataToSend = { snapshot: 'flush' };
       try {
@@ -43,7 +45,7 @@ export const Toolbar: React.FunctionComponent = () => {
         <ActionButton
           className={toolbarButtonClass}
           icon={reloadIcon}
-          title="Take snapshot"
+          title="Request a Suggestion"
           onClick={handleClick}
         />
           <ActionButton
@@ -54,7 +56,7 @@ export const Toolbar: React.FunctionComponent = () => {
           />
       </div>
       <div className={spacer} />
-      <div>{text}</div>
+      <div style={{ whiteSpace:"pre-line"}}>{text}</div>
     </nav>
   );
 };
