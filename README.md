@@ -9,6 +9,7 @@ for the frontend extension.
 ## Requirements
 
 - JupyterLab >= 3.0
+- conda >= 4.12
 
 ## Install
 
