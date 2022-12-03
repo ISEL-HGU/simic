@@ -13,7 +13,7 @@ from tornado.web import StaticFileHandler
 
 def connect_to_pool(is_request: int, *args, **kwargs):
     host = "127.0.0.1"          # Get local machine name
-    port = 64555                        # Reserve a port for your   service.
+    port = 64555                        # Change these according to your environment
     conn = socket.socket()                   # Create a socket object
 
     conn.connect((host, port))
@@ -49,11 +49,11 @@ def execute_gumtree(path1: str, path2: str):
     srcPath = os.getcwd()+path1
     dstPath = os.getcwd()+path2
     process = subprocess.Popen(['make','-C' ,os.path.dirname(__file__)+'/simic_subprocesses', 'es_run','src='+srcPath, 'dst='+dstPath], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    val = None
-    for line in process.stdout:
-        val = line
-        print(line)
-    return str(val).replace('b\'','').replace('\\n\'','')    
+    output = [line for line in process.stdout]
+    es = str(output[-1]).replace('b\'','').replace('\\n\'','')    
+    if 'Leaving directory' in es:
+        es = str(output[-2]).replace('b\'','').replace('\\n\'','')
+    return es 
 
 
 class RouteHandler(APIHandler):
