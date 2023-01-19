@@ -10,6 +10,7 @@ for the frontend extension.
 
 - JupyterLab >= 3.0
 - conda >= 4.12
+- [simic pool](https://github.com/ISEL-HGU/simic_pool) cloned
 
 ## Install
 
